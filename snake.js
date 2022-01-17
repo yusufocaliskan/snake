@@ -75,7 +75,8 @@ let moveLeft = ([t, l]) => [t, l - 1];
 let moveUp = ([t, l]) => [t - 1, l];
 let moveDown = ([t, l]) => [t + 1,l];
 
-let currentDirection = moveDown
+let currentDirection = moveRight;
+let directionQueue = [];
 
 window.addEventListener('keydown', (e) => {
 
@@ -83,60 +84,95 @@ window.addEventListener('keydown', (e) => {
 			case "ArrowLeft":
 			case "A":
 			case "a":
-				if(currentDirection !== moveRight)
-				{
-					currentDirection = moveLeft;
-				}
+				directionQueue.push(moveLeft);				
 				break;
 			case "ArrowRight":
 			case "D":
 			case "d":
-				if(currentDirection !== moveLeft)
-				{
-					currentDirection = moveRight;
-				}
+				directionQueue.push(moveRight);
 				break;
 			case "ArrowUp":
 			case "W":
 			case "w":
-				if(currentDirection !== moveDown)
-				{
-					currentDirection = moveUp;
-				}
+				directionQueue.push(moveUp);
 				break;
 			case "ArrowDown":
 			case "S":
 			case "s":
-				if(currentDirection !== moveUp)
-				{
-					currentDirection = moveDown;
-				}
+				directionQueue.push(moveDown);
 				break;
 		};
 
+		
 
 });
 
 function step(){
 	currentSnake.shift();
 	let head = currentSnake[currentSnake.length - 1];
+
+	let nextDirection = currentDirection;
+	
+	while(directionQueue.length > 0)
+	{
+		let candidateDirection = directionQueue.shift();
+		if(!areOpposite(candidateDirection, currentDirection))
+		{
+			nextDirection = candidateDirection;
+			break;
+		}
+
+		
+		
+	}
+
+	currentDirection = nextDirection;
+
 	let nextHead = currentDirection(head);
 
 	currentSnake.push(nextHead);
-
 	drawSnake(currentSnake);
 }
+
+function areOpposite(dir1, dir2)
+{
+	if(dir1 === moveLeft && dir2 === moveRight)
+	{
+		return true;
+	}
+
+	if(dir1 === moveRight && dir2 === moveLeft)
+	{
+		return true;
+	}
+
+	if(dir1 === moveUp && dir2 === moveDown)
+	{
+		return true;
+	}
+
+	if(dir1 === moveDown && dir2 === moveUp)
+	{
+		return true;
+	}
+
+	return false;
+}	
 
 drawSnake(currentSnake);
 setInterval(() => {
 
 	step();
 
-}, 100);
+}, 500);
 
 
 
 
+function dump(obj)
+{
+	document.getElementById('debug').innerText = JSON.stringify(obj);
+}
 
 
 
